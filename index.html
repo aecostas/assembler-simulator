@@ -19,6 +19,7 @@
                     <button type="button" class="btn btn-default navbar-btn" ng-click="executeStep()" ng-disabled="isRunning"><span class="glyphicon glyphicon-forward"></span> Step</button>
                 </div>
                 <button type="button" class="btn btn-default navbar-btn" ng-click="reset()">Reset</button>
+		<button type="button" class="btn btn-default" ng-click="assemble()">Assemble</button>
             </div>
             <div class="navbar-header navbar-right">
                 <a class="navbar-brand" style="color:#FFFFFF">Simple 8-bit Assembler Simulator</a>
@@ -42,7 +43,7 @@
                                       tab-support
                                       select-line
                                       ng-model="code"></textarea>
-                            <button type="button" class="btn btn-default" ng-click="assemble()">Assemble</button>
+
                         </form>
                     </div>
                 </div>
