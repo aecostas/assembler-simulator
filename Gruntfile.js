@@ -26,6 +26,7 @@ module.exports = function(grunt) {
             options: {
                 // options here to override JSHint defaults
                 trailing: true,
+		"-W099": true, 
                 globals: {
                     browser: true,
                     console: true
