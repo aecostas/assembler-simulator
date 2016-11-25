@@ -84,15 +84,22 @@ app.service('assembler', ['opcodes', function (opcodes) {
             };
 
             for (var i = 0, l = lines.length; i < l; i++) {
+		// TODO: check no extra args
 		if (lines[i].trim().length == 0) {
 		    continue;
 		};
 
                 var match = regex.exec(lines[i]);
-		var instr = match[1].toUpperCase();
 		
-		// TODO: check errors
-		// if CO_FIELD[instr] undefined
+		if (!match) {
+		    // TODO: as a future improvement, we could
+		    // allow to parse all the file to show the errors
+		    // on the screen. Current implementation will throw
+		    // an error
+		    throw {line: i, error: "Error parsing instruction: "+lines[i]};
+		};
+		
+		var instr = match[1].toUpperCase();
 		code.push(CO_field[instr]);
 
 		switch (instr) {
@@ -101,26 +108,23 @@ app.service('assembler', ['opcodes', function (opcodes) {
 		case 'ADD':
 		case 'BR':
 		case 'BZ':
-		    // TODO: as a future improvement, we could
-		    // allow to parse all the file to show the errors
-		    // on the screen. Current implementation will throw
-		    // an error
 		    code.push(parseAddress(match[2]));
 		    break;
-		    
+	    
 		case 'CLR':
 		case 'DEC':
 		case 'HALT':
 		    // check no extra args
 		    break;
+
+		default:
+		    throw "Unknown instruction";
 		}
-		
+	
 		// Add mapping instr pos to line number
 		mapping[code.length] = i;
+
 	    } // for
-	    
-	    console.warn(code);
-	    console.warn(mapping);
 
             return {code: code, mapping: mapping, labels: labels};
         }

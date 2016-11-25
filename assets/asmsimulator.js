@@ -85,15 +85,22 @@ var app = angular.module('ASMSimulator', []);
             };
 
             for (var i = 0, l = lines.length; i < l; i++) {
+		// TODO: check no extra args
 		if (lines[i].trim().length == 0) {
 		    continue;
 		};
 
                 var match = regex.exec(lines[i]);
-		var instr = match[1].toUpperCase();
 		
-		// TODO: check errors
-		// if CO_FIELD[instr] undefined
+		if (!match) {
+		    // TODO: as a future improvement, we could
+		    // allow to parse all the file to show the errors
+		    // on the screen. Current implementation will throw
+		    // an error
+		    throw {line: i, error: "Error parsing instruction: "+lines[i]};
+		};
+		
+		var instr = match[1].toUpperCase();
 		code.push(CO_field[instr]);
 
 		switch (instr) {
@@ -102,473 +109,23 @@ var app = angular.module('ASMSimulator', []);
 		case 'ADD':
 		case 'BR':
 		case 'BZ':
-		    // TODO: as a future improvement, we could
-		    // allow to parse all the file to show the errors
-		    // on the screen. Current implementation will throw
-		    // an error
 		    code.push(parseAddress(match[2]));
 		    break;
-		    
+	    
 		case 'CLR':
 		case 'DEC':
 		case 'HALT':
 		    // check no extra args
 		    break;
+
+		default:
+		    throw "Unknown instruction";
 		}
-		
+	
 		// Add mapping instr pos to line number
 		mapping[code.length] = i;
+
 	    } // for
-
-	    
-	    console.warn(code);
-	    console.warn(mapping);
-	    
-            //         if (match[1] !== undefined || match[2] !== undefined) {
-            //             if (match[1] !== undefined) {
-            //                 addLabel(match[1]);
-            //             }
-
-            //             if (match[2] !== undefined) {
-            //                 var instr = match[2].toUpperCase();
-            //                 var p1, p2, opCode;
-
-            //                 // Add mapping instr pos to line number
-            //                 // Don't do it for DB as this is not a real instruction
-            //                 if (instr !== 'DB') {
-            //                     mapping[code.length] = i;
-            //                 }
-
-	    // 		    console.warn(instr);
-	    // 		    continue;
-            //                 switch (instr) {
-            //                     case 'DB':
-            //                         p1 = getValue(match[op1_group]);
-
-            //                         if (p1.type === "number")
-            //                             code.push(p1.value);
-            //                         else if (p1.type === "numbers")
-            //                             for (var j = 0, k = p1.value.length; j < k; j++) {
-            //                                 code.push(p1.value[j]);
-            //                             }
-            //                         else
-            //                             throw "DB does not support this operand";
-
-            //                         break;
-            //                     case 'HLT':
-            //                         checkNoExtraArg('HLT', match[op1_group]);
-            //                         opCode = opcodes.NONE;
-            //                         code.push(opCode);
-            //                         break;
-
-            //                     case 'MOV':
-            //                         p1 = getValue(match[op1_group]);
-            //                         p2 = getValue(match[op2_group]);
-
-            //                         if (p1.type === "register" && p2.type === "register")
-            //                             opCode = opcodes.MOV_REG_TO_REG;
-            //                         else if (p1.type === "register" && p2.type === "address")
-            //                             opCode = opcodes.MOV_ADDRESS_TO_REG;
-            //                         else if (p1.type === "register" && p2.type === "regaddress")
-            //                             opCode = opcodes.MOV_REGADDRESS_TO_REG;
-            //                         else if (p1.type === "address" && p2.type === "register")
-            //                             opCode = opcodes.MOV_REG_TO_ADDRESS;
-            //                         else if (p1.type === "regaddress" && p2.type === "register")
-            //                             opCode = opcodes.MOV_REG_TO_REGADDRESS;
-            //                         else if (p1.type === "register" && p2.type === "number")
-            //                             opCode = opcodes.MOV_NUMBER_TO_REG;
-            //                         else if (p1.type === "address" && p2.type === "number")
-            //                             opCode = opcodes.MOV_NUMBER_TO_ADDRESS;
-            //                         else if (p1.type === "regaddress" && p2.type === "number")
-            //                             opCode = opcodes.MOV_NUMBER_TO_REGADDRESS;
-            //                         else
-            //                             throw "MOV does not support this operands";
-
-            //                         code.push(opCode, p1.value, p2.value);
-            //                         break;
-            //                     case 'ADD':
-            //                         p1 = getValue(match[op1_group]);
-            //                         p2 = getValue(match[op2_group]);
-
-            //                         if (p1.type === "register" && p2.type === "register")
-            //                             opCode = opcodes.ADD_REG_TO_REG;
-            //                         else if (p1.type === "register" && p2.type === "regaddress")
-            //                             opCode = opcodes.ADD_REGADDRESS_TO_REG;
-            //                         else if (p1.type === "register" && p2.type === "address")
-            //                             opCode = opcodes.ADD_ADDRESS_TO_REG;
-            //                         else if (p1.type === "register" && p2.type === "number")
-            //                             opCode = opcodes.ADD_NUMBER_TO_REG;
-            //                         else
-            //                             throw "ADD does not support this operands";
-
-            //                         code.push(opCode, p1.value, p2.value);
-            //                         break;
-            //                     case 'SUB':
-            //                         p1 = getValue(match[op1_group]);
-            //                         p2 = getValue(match[op2_group]);
-
-            //                         if (p1.type === "register" && p2.type === "register")
-            //                             opCode = opcodes.SUB_REG_FROM_REG;
-            //                         else if (p1.type === "register" && p2.type === "regaddress")
-            //                             opCode = opcodes.SUB_REGADDRESS_FROM_REG;
-            //                         else if (p1.type === "register" && p2.type === "address")
-            //                             opCode = opcodes.SUB_ADDRESS_FROM_REG;
-            //                         else if (p1.type === "register" && p2.type === "number")
-            //                             opCode = opcodes.SUB_NUMBER_FROM_REG;
-            //                         else
-            //                             throw "SUB does not support this operands";
-
-            //                         code.push(opCode, p1.value, p2.value);
-            //                         break;
-            //                     case 'INC':
-            //                         p1 = getValue(match[op1_group]);
-            //                         checkNoExtraArg('INC', match[op2_group]);
-
-            //                         if (p1.type === "register")
-            //                             opCode = opcodes.INC_REG;
-            //                         else
-            //                             throw "INC does not support this operand";
-
-            //                         code.push(opCode, p1.value);
-
-            //                         break;
-            //                     case 'DEC':
-            //                         p1 = getValue(match[op1_group]);
-            //                         checkNoExtraArg('DEC', match[op2_group]);
-
-            //                         if (p1.type === "register")
-            //                             opCode = opcodes.DEC_REG;
-            //                         else
-            //                             throw "DEC does not support this operand";
-
-            //                         code.push(opCode, p1.value);
-
-            //                         break;
-            //                     case 'CMP':
-            //                         p1 = getValue(match[op1_group]);
-            //                         p2 = getValue(match[op2_group]);
-
-            //                         if (p1.type === "register" && p2.type === "register")
-            //                             opCode = opcodes.CMP_REG_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "regaddress")
-            //                             opCode = opcodes.CMP_REGADDRESS_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "address")
-            //                             opCode = opcodes.CMP_ADDRESS_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "number")
-            //                             opCode = opcodes.CMP_NUMBER_WITH_REG;
-            //                         else
-            //                             throw "CMP does not support this operands";
-
-            //                         code.push(opCode, p1.value, p2.value);
-            //                         break;
-            //                     case 'JMP':
-            //                         p1 = getValue(match[op1_group]);
-            //                         checkNoExtraArg('JMP', match[op2_group]);
-
-            //                         if (p1.type === "register")
-            //                             opCode = opcodes.JMP_REGADDRESS;
-            //                         else if (p1.type === "number")
-            //                             opCode = opcodes.JMP_ADDRESS;
-            //                         else
-            //                             throw "JMP does not support this operands";
-
-            //                         code.push(opCode, p1.value);
-            //                         break;
-            //                     case 'JC':
-            //                     case 'JB':
-            //                     case 'JNAE':
-            //                         p1 = getValue(match[op1_group]);
-            //                         checkNoExtraArg(instr, match[op2_group]);
-
-            //                         if (p1.type === "register")
-            //                             opCode = opcodes.JC_REGADDRESS;
-            //                         else if (p1.type === "number")
-            //                             opCode = opcodes.JC_ADDRESS;
-            //                         else
-            //                             throw instr + " does not support this operand";
-
-            //                         code.push(opCode, p1.value);
-            //                         break;
-            //                     case 'JNC':
-            //                     case 'JNB':
-            //                     case 'JAE':
-            //                         p1 = getValue(match[op1_group]);
-            //                         checkNoExtraArg(instr, match[op2_group]);
-
-            //                         if (p1.type === "register")
-            //                             opCode = opcodes.JNC_REGADDRESS;
-            //                         else if (p1.type === "number")
-            //                             opCode = opcodes.JNC_ADDRESS;
-            //                         else
-            //                             throw instr + "does not support this operand";
-
-            //                         code.push(opCode, p1.value);
-            //                         break;
-            //                     case 'JZ':
-            //                     case 'JE':
-            //                         p1 = getValue(match[op1_group]);
-            //                         checkNoExtraArg(instr, match[op2_group]);
-
-            //                         if (p1.type === "register")
-            //                             opCode = opcodes.JZ_REGADDRESS;
-            //                         else if (p1.type === "number")
-            //                             opCode = opcodes.JZ_ADDRESS;
-            //                         else
-            //                             throw instr + " does not support this operand";
-
-            //                         code.push(opCode, p1.value);
-            //                         break;
-            //                     case 'JNZ':
-            //                     case 'JNE':
-            //                         p1 = getValue(match[op1_group]);
-            //                         checkNoExtraArg(instr, match[op2_group]);
-
-            //                         if (p1.type === "register")
-            //                             opCode = opcodes.JNZ_REGADDRESS;
-            //                         else if (p1.type === "number")
-            //                             opCode = opcodes.JNZ_ADDRESS;
-            //                         else
-            //                             throw instr + " does not support this operand";
-
-            //                         code.push(opCode, p1.value);
-            //                         break;
-            //                     case 'JA':
-            //                     case 'JNBE':
-            //                         p1 = getValue(match[op1_group]);
-            //                         checkNoExtraArg(instr, match[op2_group]);
-
-            //                         if (p1.type === "register")
-            //                             opCode = opcodes.JA_REGADDRESS;
-            //                         else if (p1.type === "number")
-            //                             opCode = opcodes.JA_ADDRESS;
-            //                         else
-            //                             throw instr + " does not support this operand";
-
-            //                         code.push(opCode, p1.value);
-            //                         break;
-            //                     case 'JNA':
-            //                     case 'JBE':
-            //                         p1 = getValue(match[op1_group]);
-            //                         checkNoExtraArg(instr, match[op2_group]);
-
-            //                         if (p1.type === "register")
-            //                             opCode = opcodes.JNA_REGADDRESS;
-            //                         else if (p1.type === "number")
-            //                             opCode = opcodes.JNA_ADDRESS;
-            //                         else
-            //                             throw instr + " does not support this operand";
-
-            //                         code.push(opCode, p1.value);
-            //                         break;
-            //                     case 'PUSH':
-            //                         p1 = getValue(match[op1_group]);
-            //                         checkNoExtraArg(instr, match[op2_group]);
-
-            //                         if (p1.type === "register")
-            //                             opCode = opcodes.PUSH_REG;
-            //                         else if (p1.type === "regaddress")
-            //                             opCode = opcodes.PUSH_REGADDRESS;
-            //                         else if (p1.type === "address")
-            //                             opCode = opcodes.PUSH_ADDRESS;
-            //                         else if (p1.type === "number")
-            //                             opCode = opcodes.PUSH_NUMBER;
-            //                         else
-            //                             throw "PUSH does not support this operand";
-
-            //                         code.push(opCode, p1.value);
-            //                         break;
-            //                     case 'POP':
-            //                         p1 = getValue(match[op1_group]);
-            //                         checkNoExtraArg(instr, match[op2_group]);
-
-            //                         if (p1.type === "register")
-            //                             opCode = opcodes.POP_REG;
-            //                         else
-            //                             throw "PUSH does not support this operand";
-
-            //                         code.push(opCode, p1.value);
-            //                         break;
-            //                     case 'CALL':
-            //                         p1 = getValue(match[op1_group]);
-            //                         checkNoExtraArg(instr, match[op2_group]);
-
-            //                         if (p1.type === "register")
-            //                             opCode = opcodes.CALL_REGADDRESS;
-            //                         else if (p1.type === "number")
-            //                             opCode = opcodes.CALL_ADDRESS;
-            //                         else
-            //                             throw "CALL does not support this operand";
-
-            //                         code.push(opCode, p1.value);
-            //                         break;
-            //                     case 'RET':
-            //                         checkNoExtraArg(instr, match[op1_group]);
-
-            //                         opCode = opcodes.RET;
-
-            //                         code.push(opCode);
-            //                         break;
-
-            //                     case 'MUL':
-            //                         p1 = getValue(match[op1_group]);
-            //                         checkNoExtraArg(instr, match[op2_group]);
-
-            //                         if (p1.type === "register")
-            //                             opCode = opcodes.MUL_REG;
-            //                         else if (p1.type === "regaddress")
-            //                             opCode = opcodes.MUL_REGADDRESS;
-            //                         else if (p1.type === "address")
-            //                             opCode = opcodes.MUL_ADDRESS;
-            //                         else if (p1.type === "number")
-            //                             opCode = opcodes.MUL_NUMBER;
-            //                         else
-            //                             throw "MULL does not support this operand";
-
-            //                         code.push(opCode, p1.value);
-            //                         break;
-            //                     case 'DIV':
-            //                         p1 = getValue(match[op1_group]);
-            //                         checkNoExtraArg(instr, match[op2_group]);
-
-            //                         if (p1.type === "register")
-            //                             opCode = opcodes.DIV_REG;
-            //                         else if (p1.type === "regaddress")
-            //                             opCode = opcodes.DIV_REGADDRESS;
-            //                         else if (p1.type === "address")
-            //                             opCode = opcodes.DIV_ADDRESS;
-            //                         else if (p1.type === "number")
-            //                             opCode = opcodes.DIV_NUMBER;
-            //                         else
-            //                             throw "DIV does not support this operand";
-
-            //                         code.push(opCode, p1.value);
-            //                         break;
-            //                     case 'AND':
-            //                         p1 = getValue(match[op1_group]);
-            //                         p2 = getValue(match[op2_group]);
-
-            //                         if (p1.type === "register" && p2.type === "register")
-            //                             opCode = opcodes.AND_REG_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "regaddress")
-            //                             opCode = opcodes.AND_REGADDRESS_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "address")
-            //                             opCode = opcodes.AND_ADDRESS_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "number")
-            //                             opCode = opcodes.AND_NUMBER_WITH_REG;
-            //                         else
-            //                             throw "AND does not support this operands";
-
-            //                         code.push(opCode, p1.value, p2.value);
-            //                         break;
-            //                     case 'OR':
-            //                         p1 = getValue(match[op1_group]);
-            //                         p2 = getValue(match[op2_group]);
-
-            //                         if (p1.type === "register" && p2.type === "register")
-            //                             opCode = opcodes.OR_REG_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "regaddress")
-            //                             opCode = opcodes.OR_REGADDRESS_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "address")
-            //                             opCode = opcodes.OR_ADDRESS_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "number")
-            //                             opCode = opcodes.OR_NUMBER_WITH_REG;
-            //                         else
-            //                             throw "OR does not support this operands";
-
-            //                         code.push(opCode, p1.value, p2.value);
-            //                         break;
-            //                     case 'XOR':
-            //                         p1 = getValue(match[op1_group]);
-            //                         p2 = getValue(match[op2_group]);
-
-            //                         if (p1.type === "register" && p2.type === "register")
-            //                             opCode = opcodes.XOR_REG_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "regaddress")
-            //                             opCode = opcodes.XOR_REGADDRESS_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "address")
-            //                             opCode = opcodes.XOR_ADDRESS_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "number")
-            //                             opCode = opcodes.XOR_NUMBER_WITH_REG;
-            //                         else
-            //                             throw "XOR does not support this operands";
-
-            //                         code.push(opCode, p1.value, p2.value);
-            //                         break;
-            //                     case 'NOT':
-            //                         p1 = getValue(match[op1_group]);
-            //                         checkNoExtraArg(instr, match[op2_group]);
-
-            //                         if (p1.type === "register")
-            //                             opCode = opcodes.NOT_REG;
-            //                         else
-            //                             throw "NOT does not support this operand";
-
-            //                         code.push(opCode, p1.value);
-            //                         break;
-            //                     case 'SHL':
-            //                     case 'SAL':
-            //                         p1 = getValue(match[op1_group]);
-            //                         p2 = getValue(match[op2_group]);
-
-            //                         if (p1.type === "register" && p2.type === "register")
-            //                             opCode = opcodes.SHL_REG_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "regaddress")
-            //                             opCode = opcodes.SHL_REGADDRESS_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "address")
-            //                             opCode = opcodes.SHL_ADDRESS_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "number")
-            //                             opCode = opcodes.SHL_NUMBER_WITH_REG;
-            //                         else
-            //                             throw instr + " does not support this operands";
-
-            //                         code.push(opCode, p1.value, p2.value);
-            //                         break;
-            //                     case 'SHR':
-            //                     case 'SAR':
-            //                         p1 = getValue(match[op1_group]);
-            //                         p2 = getValue(match[op2_group]);
-
-            //                         if (p1.type === "register" && p2.type === "register")
-            //                             opCode = opcodes.SHR_REG_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "regaddress")
-            //                             opCode = opcodes.SHR_REGADDRESS_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "address")
-            //                             opCode = opcodes.SHR_ADDRESS_WITH_REG;
-            //                         else if (p1.type === "register" && p2.type === "number")
-            //                             opCode = opcodes.SHR_NUMBER_WITH_REG;
-            //                         else
-            //                             throw instr + " does not support this operands";
-
-            //                         code.push(opCode, p1.value, p2.value);
-            //                         break;
-            //                     default:
-            //                         throw "Invalid instruction: " + match[2];
-            //                 }
-            //             }
-            //         } else {
-            //             // Check if line starts with a comment otherwise the line contains an error and can not be parsed
-            //             var line = lines[i].trim();
-            //             if (line !== "" && line.slice(0, 1) !== ";") {
-            //                 throw "Syntax error";
-            //             }
-            //         }
-            //     } catch (e) {
-            //         throw {error: e, line: i};
-            //     }
-
-	    // }
-
-            // Replace label
-            // for (i = 0, l = code.length; i < l; i++) {
-            //     if (!angular.isNumber(code[i])) {
-            //         if (code[i] in labels) {
-            //             code[i] = labels[code[i]];
-            //         } else {
-
-            //             throw {error: "Undefined label: " + code[i]};
-            //         }
-            //     }
-            // }
 
             return {code: code, mapping: mapping, labels: labels};
         }
@@ -1317,13 +874,16 @@ var app = angular.module('ASMSimulator', []);
             var binary = assembly.code;
             $scope.labels = assembly.labels;
 
-            if (binary.length > memory.data.length)
+            if (binary.length > memory.data.length) {
                 throw "Binary code does not fit into the memory. Max " + memory.data.length + " bytes are allowed";
-
+	    };
+	    
             for (var i = 0, l = binary.length; i < l; i++) {
                 memory.data[i] = binary[i];
             }
+
         } catch (e) {
+	    console.warn(e);
             if (e.line !== undefined) {
                 $scope.error = e.line + " | " + e.error;
                 $scope.selectedLine = e.line;
